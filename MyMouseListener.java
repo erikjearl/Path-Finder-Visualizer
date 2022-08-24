@@ -15,16 +15,7 @@ public class MyMouseListener extends MouseAdapter {
         if (e.getButton() == MouseEvent.BUTTON1) {
             gridMap.labelPressed((JLabel)e.getSource());
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            /*
-            Color[][] myColors = gridMap.getMyColors();
-            for (int row = 0; row < myColors.length; row++) {
-                for (int col = 0; col < myColors[row].length; col++) {
-                    System.out.print(myColors[row][col] + " ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-            */
+
         }
     }
 }

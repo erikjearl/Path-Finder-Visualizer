@@ -147,7 +147,8 @@ public class AStarSearch {
         MapLocation northEast   = new MapLocation(loc.x + 1, loc.y - 1);
         MapLocation southWest   = new MapLocation(loc.x - 1, loc.y + 1);
         MapLocation southEast   = new MapLocation(loc.x + 1, loc.y + 1);
-        MapLocation[] successors = {north, south, east, west, northEast, northWest, southEast, southWest};
+        //MapLocation[] successors = {north, south, east, west, northEast, northWest, southEast, southWest};
+        MapLocation[] successors = {north, south, east, west};
 
         for (int i = 0; i < successors.length; i++) {
             if ( successors[i].x < 0 || successors[i].x > xExtent || successors[i].y < 0 || successors[i].y > yExtent) {
