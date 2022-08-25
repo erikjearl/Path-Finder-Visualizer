@@ -37,7 +37,7 @@ public class GridMap extends JPanel {
                 if (label == labels[row][col]) {        //if label was clicked
                     Color myColor = null;
                     if(Main.setStartBoolean) {          // move start
-                        resetGrid(true);
+                        resetGrid(false);
                         MapLocation start = Main.getStartLocation();
                         colors[start.y][start.x] = Main.DEFAULT_COLOR;
                         labels[start.y][start.x].setBackground(Main.DEFAULT_COLOR);
@@ -46,7 +46,7 @@ public class GridMap extends JPanel {
                         myColor = Main.START_COLOR;
                         Main.setStartBoolean = false;
                     }else if(Main.setEndBoolean){       // move end
-                        resetGrid(true);
+                        resetGrid(false);
                         MapLocation end = Main.getEndLocation();
                         colors[end.y][end.x] = Main.DEFAULT_COLOR;
                         labels[end.y][end.x].setBackground(Main.DEFAULT_COLOR);
@@ -71,12 +71,13 @@ public class GridMap extends JPanel {
         }
     }
 
-    public void resetGrid(boolean keepBlocks){ // resetBlocks 0:all, 1:remove path
+
+    public void resetGrid(boolean resetBlocks) {// resetBlocks 0:all, 1:remove path
         for (int row = 0; row < labels.length; row++) {
             for (int col = 0; col < labels[row].length; col++) {
                 MapLocation loc = new MapLocation(col,row);
                 if(!loc.equals(Main.getStartLocation()) && !loc.equals(Main.getEndLocation())) {
-                    if(keepBlocks) {
+                    if(!resetBlocks) {
                         if (colors[row][col].equals(Main.BLOCK_COLOR)) {
                             continue;
                         }

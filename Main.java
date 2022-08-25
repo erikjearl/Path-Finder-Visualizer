@@ -5,10 +5,10 @@ import java.awt.event.ActionListener;
 import java.util.*;
 
 public class Main implements ActionListener{
-    final static int rows = 15;
-    final static int cols = 15;
+    final static int rows = 25;
+    final static int cols = 25;
     final static int cellWidth = 25;
-    final static Color DEFAULT_COLOR = Color.LIGHT_GRAY;;
+    final static Color DEFAULT_COLOR = Color.LIGHT_GRAY;
     final static Color BLOCK_COLOR = Color.RED;
     final static Color START_COLOR = Color.GREEN;
     final static Color END_COLOR = Color.ORANGE;
@@ -21,8 +21,9 @@ public class Main implements ActionListener{
     static JButton runButton;
     static JButton setStartButton;
     static JButton setEndButton;
-    static JButton resetButton;
+    static JButton randomizeButton;
     static JButton generateBlocksButton;
+    static JButton resetButton;
 
     static MapLocation start;
     static MapLocation end;
@@ -34,7 +35,7 @@ public class Main implements ActionListener{
     public static void main(String[] args) {
         Main runner = new Main();
 
-        blockLocations = new HashSet<MapLocation>();
+        blockLocations = new HashSet<>();
         start = new MapLocation(2,2);
         end = new MapLocation(cols-3,rows-3);
 
@@ -51,26 +52,60 @@ public class Main implements ActionListener{
 
         //side panel
         sidePanel = new JPanel();
-        sidePanel.setPreferredSize(new Dimension(100, cols * cellWidth));
-        sidePanel.setBackground(Color.WHITE);
+        sidePanel.setPreferredSize(new Dimension(125, cols * cellWidth));
+        sidePanel.setBackground(Color.black);
+        //sidePanel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS))); // center on vertical axis
+
         JLabel title = new JLabel("CONTROLS");
+        title.setFont(new Font("Courier", Font.BOLD,18));
+        title.setForeground(Color.white);
+        title.setBackground(Color.darkGray);
+
         runButton = new JButton("Find Path");
+        runButton.setPreferredSize(new Dimension(125,40));
+        runButton.setOpaque(true);
+        runButton.setBackground(PATH_COLOR);
         runButton.addActionListener(this);
+
         setStartButton = new JButton("Set Start");
+        setStartButton.setPreferredSize(new Dimension(125,40));
+        setStartButton.setOpaque(true);
+        setStartButton.setBackground(START_COLOR);
         setStartButton.addActionListener(this);
+
         setEndButton = new JButton("Set End");
+        setEndButton.setPreferredSize(new Dimension(125,40));
+        setEndButton.setOpaque(true);
+        setEndButton.setBackground(END_COLOR);
         setEndButton.addActionListener(this);
-        resetButton = new JButton("Reset");
-        resetButton.addActionListener(this);
-        generateBlocksButton = new JButton("Generate Blocks");
+
+        generateBlocksButton = new JButton("Set Blocks");
+        generateBlocksButton.setPreferredSize(new Dimension(125,40));
+        generateBlocksButton.setOpaque(true);
+        generateBlocksButton.setBackground(BLOCK_COLOR);
         generateBlocksButton.addActionListener(this);
+
+        randomizeButton = new JButton("Randomize");
+        randomizeButton.setPreferredSize(new Dimension(125,40));
+        randomizeButton.setOpaque(true);
+        randomizeButton.setBackground(Color.magenta);
+        randomizeButton.addActionListener(this);
+
+        resetButton = new JButton("Reset");
+        resetButton.setPreferredSize(new Dimension(125,40));
+        resetButton.setOpaque(true);
+        resetButton.setBackground(Color.darkGray);
+        resetButton.addActionListener(this);
+
         sidePanel.add(title);
         sidePanel.add(runButton);
         sidePanel.add(setStartButton);
         sidePanel.add(setEndButton);
-        sidePanel.add(resetButton);
         sidePanel.add(generateBlocksButton);
+        sidePanel.add(randomizeButton);
+        sidePanel.add(resetButton);
 
+        mainPanel.setBackground(Color.darkGray);
         mainPanel.add(gridPanel);
         mainPanel.add(sidePanel);
 
@@ -83,7 +118,7 @@ public class Main implements ActionListener{
 
     private void updateBlockLocations() {
         Color[][] labels = gridPanel.getLabelColors();
-        blockLocations = new HashSet<MapLocation>();
+        blockLocations = new HashSet<>();
         for (int row = 0; row < labels.length; row++) {
             for (int col = 0; col < labels[row].length; col++) {
                 if (labels[row][col].equals(BLOCK_COLOR)) {
@@ -118,27 +153,43 @@ public class Main implements ActionListener{
 
     private void generateBlocks(){
         System.out.println("GENERATING BLOCKS");
+        resetGrid(false);
         Color[][] colors = gridPanel.getLabelColors();
         Random rand = new Random();
+
         for (int row = 0; row < colors.length; row++) {
             for (int col = 0; col < colors[row].length; col++) {
-                int num = rand.nextInt(5);
+                int num = rand.nextInt(10);
                 if ( (colors[row][col] == DEFAULT_COLOR || colors[row][col] == PATH_COLOR) && (num == 0 || num == 1)) {
-                        gridPanel.setLabelColor(col, row, BLOCK_COLOR);
-                        updateBlockLocations();
-                        AStarSearch aStar = new AStarSearch(start, end, cols-1, rows-1, blockLocations);
-                        Stack<MapLocation> path = aStar.getPath();
-                        if (path == null) {
-                            gridPanel.setLabelColor(col, row, DEFAULT_COLOR);
-                            System.out.println("NOPATH UNDO--------------------");
-                        } else {
-                            System.out.println(col + "," + row + " HAS A PATH: " + path);
-                        }
+                    gridPanel.setLabelColor(row, col, BLOCK_COLOR);
+                    updateBlockLocations();
+                    AStarSearch aStar = new AStarSearch(start, end, cols-1, rows-1, blockLocations);
+                    Stack<MapLocation> path = aStar.getPath();
+                    if (path == null) {
+                        gridPanel.setLabelColor(row, col, DEFAULT_COLOR);
+                    }
                 }else if (colors[row][col] == BLOCK_COLOR && num == 0) {
-                    gridPanel.setLabelColor(col, row, DEFAULT_COLOR);
+                    gridPanel.setLabelColor(row, col, DEFAULT_COLOR);
                 }
             }
         }
+        if (rand.nextInt(10) != 0){
+            generateBlocks();
+        }
+    }
+
+    private void randomizeEndPoints(){
+        resetGrid(false);
+        Random rand = new Random();
+        // start location
+        gridPanel.setLabelColor(start.y,start.x,DEFAULT_COLOR);
+        start = new MapLocation(rand.nextInt(cols), rand.nextInt(rows));
+        gridPanel.setLabelColor(start.y,start.x,START_COLOR);
+        // end location
+        gridPanel.setLabelColor(end.y,end.x,DEFAULT_COLOR);
+        end = new MapLocation(rand.nextInt(cols), rand.nextInt(rows));
+        gridPanel.setLabelColor(end.y,end.x,END_COLOR);
+        System.out.println(Arrays.deepToString(gridPanel.getLabelColors()));
     }
 
     private void setStartButton(){
@@ -181,11 +232,15 @@ public class Main implements ActionListener{
         if(e.getSource().equals(setEndButton)) {
             setEndButton();
         }
-        if(e.getSource().equals(resetButton)) {
+        if(e.getSource().equals(randomizeButton)) {
             resetGrid(true);
+            randomizeEndPoints();
         }
         if(e.getSource().equals(generateBlocksButton)) {
             generateBlocks();
+        }
+        if(e.getSource().equals(resetButton)) {
+            resetGrid(true);
         }
     }
 }
